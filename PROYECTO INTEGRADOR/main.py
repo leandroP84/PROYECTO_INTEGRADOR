@@ -1,8 +1,13 @@
 import requests as rq # type: ignore
 from colorama import Fore , Back , Style # type: ignore
-# Api key
-api_key = "152ec4968869eb9cc777ecf6d47e4235"
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+# Api key
+# api_key = "152ec4968869eb9cc777ecf6d47e4235"
+api_key=os.getenv("API_KEY")
+print(api_key)
 # Variable para el nombre de la ciudad
 
 seleccion = 0
@@ -52,7 +57,7 @@ while seleccion != 5 :
 
                     print(Fore.BLUE + "App Clima!")
                     print("Ciudad seleccionada:", Fore.WHITE + nombre)
-                    print(Fore.GREEN + "Temperatura:", Fore.LIGHTYELLOW_EX, f"{temperatura}°C", Fore.WHITE)
+                    print(Fore.GREEN + "La temperatura actual es de: " + "Temperatura:", Fore.LIGHTYELLOW_EX, f"{temperatura}°C", Fore.WHITE)
                     #variables
                 pass
     if  seleccion == 2:
