@@ -1,47 +1,40 @@
-import requests as rq
-from colorama import Fore , Back , Style
-
-# Api key 
+import requests as rq # type: ignore
+from colorama import Fore , Back , Style # type: ignore
+# Api key
 api_key = "152ec4968869eb9cc777ecf6d47e4235"
 
-# Esta Variable deberian usarla para guardar el nombre de la variable en los inputs.
-nombre_ciudad = ""
+# Variable para el nombre de la ciudad
+nombre_ciudad = input(Fore.GREEN + "Ingrese el nombre de la ciudad: " + Fore.CYAN)
 
-
-#Esta funcion lo que hace es getear una ciudad y tambien el reporte de tiempo
-def get_wheater(api_key , lat , lon): # Recibe la api_key y la Latitud y Longitud 
-    
-    #Como recibe la LAT y LON estaba pensando en presetear algunos Países si encuentran una mejor solucion me avisan
-    # Argentina_mendoza = -32.89084 , -68.82717
-    
-    
-    # Esta es la url para llamar a la Api.
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
+# Función para obtener el clima de una ciudad
+def get_weather(api_key, nombre_ciudad):
+    # URL para llamar a la API (usando el nombre de la ciudad)
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={nombre_ciudad}&appid={api_key}&units=metric"
     
     response = rq.get(url).json()
     
-    temperatura = response['main'] # Lista con datos climatologicos
-    nombre = response['name'] # Nombre de la Región
-
-    #Esto retorna un diccionario , que se accede con el nombre de la variable y corchetes
+    if response.get("cod") != 200:
+        return {"error": f"No se encontró información para {nombre_ciudad}"}
+    
+    temperatura = response['main']['temp']  # Temperatura en grados Celsius
+    nombre = response['name']  # Nombre de la ciudad
+    
     return {
-        
-        'temperatura' : temperatura,
-        'nombre':nombre
+        'temperatura': temperatura,
+        'nombre': nombre
     }
-    
-    
-#Datos tiene el diccionario que se retorna en la linea 26-30
-Datos = get_wheater(api_key, "-32.89084" , "-68.82717")    
 
-nombre = Datos['nombre']
+# Obtener datos del clima
+Datos = get_weather(api_key, nombre_ciudad)
 
+if "error" in Datos:
+    print(Fore.RED + Datos["error"])
+else:
+    nombre = Datos['nombre']
+    temperatura = Datos['temperatura']
 
-print(Fore.BLUE + "App Clima! ")
-print(  "País seleccionado: " , Fore.WHITE + nombre)
-print( Fore.GREEN + "Datos: " ,Fore.LIGHTYELLOW_EX, Datos['temperatura'],Fore.WHITE)
+    print(Fore.BLUE + "App Clima!")
+    print("Ciudad seleccionada:", Fore.WHITE + nombre)
+    print(Fore.GREEN + "Temperatura:", Fore.LIGHTYELLOW_EX, f"{temperatura}°C", Fore.WHITE)
 
-
-
-# https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
 
