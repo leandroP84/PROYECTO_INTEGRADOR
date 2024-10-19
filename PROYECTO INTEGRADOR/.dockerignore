@@ -1,4 +1,8 @@
 .\env
 .\01
 DockerFile
+<<<<<<< HEAD
 TirameBitClima.zip
+=======
+TirameBitClima.zip
+>>>>>>> API
