@@ -7,7 +7,6 @@ from datetime import datetime  # Librería para manejar fechas y horas
 
 load_dotenv()
 # Api key
-# api_key = "152ec4968869eb9cc777ecf6d47e4235"
 api_key=os.getenv("API_KEY")
 units = "metric"  # Establecer la unidad de temperatura como Celsius
 # Función para obtener el clima de una ciudad
