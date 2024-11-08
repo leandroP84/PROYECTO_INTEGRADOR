@@ -8,7 +8,7 @@ from datetime import datetime  # Librería para manejar fechas y horas
 load_dotenv()
 # Api key
 api_key=os.getenv("API_KEY")
-units = "metric"  # Establecer la unidad de temperatura como Celsius
+
 # Función para obtener el clima de una ciudad
 # Función para obtener el clima actual
 def get_current_weather(api_key, city, country, units):
@@ -30,6 +30,9 @@ def get_current_weather(api_key, city, country, units):
     else:
         return None  # Si no se encuentra la información, devolver None
 
+#funcion para  elegir medida
+
+
 # Función para obtener el pronóstico del clima
 def get_forecast_weather(api_key, city, country, units):
     # Formar la URL para consultar el pronóstico con los parámetros de ciudad, país y unidad métrica
@@ -45,7 +48,7 @@ def get_forecast_weather(api_key, city, country, units):
         return None  # Si no se encuentra el pronóstico, devolver None
 
 # Función para guardar los datos consultados en un historial
-def save_to_history(city, country, data):
+def save_to_history(city, country, data,units):
     history = []  # Inicializar una lista para el historial
 
     # Verificar si existe un archivo de historial y cargar los datos si está presente
@@ -72,6 +75,7 @@ def print_clima_actual(datos):
         print(Fore.BLUE + "ClimaApp")  # Título de la aplicación con color
         print("Ciudad seleccionada: ", Fore.WHITE + nombre)  # Mostrar el nombre de la ciudad
         print(Fore.GREEN + "Datos actuales: ", Fore.LIGHTYELLOW_EX, datos['temperatura'], Fore.WHITE)  # Mostrar la temperatura actual
+        
     else:
         print(Fore.RED + "No se pudo obtener la información del clima.")  # Mensaje de error si no se obtienen los datos
 # Funcion pára imprimir el pronostico
@@ -98,13 +102,30 @@ def view_history():
             # Mostrar los detalles de cada consulta en el historial
             print(f"Fecha: {entry['timestamp']}")
             print(f"Ciudad: {entry['city']}, País: {entry['country']}")
-            print(f"Temperatura: {entry['data']['temperatura']['temp']}°")
+            
+            # Verificar si 'temperatura' está en los datos guardados para evitar errores
+            if 'temperatura' in entry['data']:
+                print(f"Temperatura: {entry['data']['temperatura']['temp']}°")
+            elif 'forecast' in entry['data']:
+                # Mostrar los primeros períodos del pronóstico si están presentes
+                print("Pronóstico:")
+                for forecast in entry['data']['forecast']:
+                    print(f"Fecha: {forecast['dt_txt']}, Temperatura: {forecast['main']['temp']}°, {forecast['weather'][0]['description']}")
             print("-------------------------")
     else:
         print(Fore.RED + "No hay historial disponible.")  # Mensaje de error si no hay historial
-
+# Función para cambiar unidades de temperatura
+def change_units(units):
+    if units == "metric":
+        units = "imperial"
+        print("Las unidades de temperatura ahora se mostrarán en Fahrenheit")
+    else:
+        units = "metric"
+        print("Las unidades de temperatura ahora se mostrarán en Celsius")
+    return units
 # Función principal de la aplicación
 def main():
+    units = "metric"  # Establecer la unidad de temperatura como Celsius
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')  # Limpiar la consola
 
@@ -112,20 +133,23 @@ def main():
         print(Fore.YELLOW + "1. Consultar clima actual")
         print("2. Consultar pronostico")
         print("3. Ver historial")
-        print("4. Salir")
+        print("4. Cambiar unidades de temperatura")
+        print("5. Salir")
         choice = input("Elige una opción: ")  # Leer la opción del usuario
         if choice == '1':
             # Pedir al usuario que ingrese la ciudad y el país
             city = input("Escribe la ciudad:\n")
             country = input("Escribe el país:\n")
             
-            # Obtener el clima actual
+            # Obtener el clima actual y el pronóstico para la ciudad y el país ingresados
             datos = get_current_weather(api_key, city, country, units)
+            datosforecast = get_forecast_weather(api_key, city, country, units)
 
             print_clima_actual(datos)
+            
 
             if datos:
-                save_to_history(city, country, datos)
+                save_to_history(city, country, datos,units)
 
             input("\nPresiona Enter para continuar...")
         elif choice == '2':
@@ -140,14 +164,17 @@ def main():
             print_weather(datosforecast)
 
             # Si se obtuvieron datos, guardarlos en el historial
-            if datos:
-                save_to_history(city, country, datos)
+            if datosforecast:
+                save_to_history(city, country, {'forecast': datosforecast}, units)
 
             input("\nPresiona Enter para continuar...")
         elif choice == '3':
             view_history()  # Mostrar el historial de consultas
             input("\nPresiona Enter para continuar...")
-        elif choice == '4':
+        elif choice == "4":
+            units = change_units(units)
+            input("\nPresiona Enter para continuar...")
+        elif choice == '5':
             break  # Salir del programa
 
 # Ejecutar la función principal cuando se ejecute el script
