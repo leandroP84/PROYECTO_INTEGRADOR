@@ -133,7 +133,7 @@ def main():
         print(Fore.YELLOW + "1. Consultar clima actual")
         print("2. Consultar pronostico")
         print("3. Ver historial")
-        print("4. Cambiar unidades de temperatura")
+        print("4. Cambiar unidades de temperatura (Celsius/Fahrenheit)")
         print("5. Salir")
         choice = input("Elige una opción: ")  # Leer la opción del usuario
         if choice == '1':
